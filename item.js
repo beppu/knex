@@ -1,6 +1,6 @@
-var Builder = require('./lib/builder').client('mysql');
-var Raw = require('./lib/raw');
-var chain = Builder
+var Builder = require('./lib/builder').client('postgres');
+var Raw     = require('./lib/raw');
+var chain   = Builder
                 .from('accounts')
                 .column('item1 as item4')
                 .column('item2')
@@ -16,7 +16,9 @@ var chain = Builder
                 .orderBy('otherVal', 'desc')
                 .transacting({})
                 // .forShare()
-                .having('items', '<', 300);
+                .having('items', '<', 300)
+                .limit(2)
+                .offset(1);
 
                 // .orWhere('id', '=', Builder.select('item as value').from('items').where('id', 2))
                 // .orWhere(function() {
@@ -24,5 +26,5 @@ var chain = Builder
                 // });
 
 console.log(
-  chain.select().toString()
+  chain.select('tim').toString()
 );
