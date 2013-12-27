@@ -1,4 +1,4 @@
-var Builder = require('./lib/builder').client('postgres');
+var Builder = require('./lib/builder').client('sqlite3');
 var Raw     = require('./lib/raw');
 var chain   = Builder
                 .from('accounts')
@@ -26,5 +26,5 @@ var chain   = Builder
                 // });
 
 console.log(
-  chain.select('tim').toString()
+  chain.truncate([{id: 1, 'tim': 'cool'}, {id: 2, tim: 'cool'}], 'tim').toString()
 );
