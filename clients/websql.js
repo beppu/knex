@@ -6,11 +6,7 @@ var _       = require('lodash');
 var ClientBase      = require('./base').ClientBase;
 var Builder         = require('../lib/builder').Builder;
 var Transaction     = require('../lib/transaction').Transaction;
-var SchemaInterface = require('../lib/schemainterface').SchemaInterface;
 var Promise         = require('../lib/promise').Promise;
-
-var grammar         = require('./websql/grammar').grammar;
-var schemaGrammar   = require('./websql/schemagrammar').schemaGrammar;
 
 // Constructor for the SQLite3Client.
 var WebSQL = exports.Client = ClientBase.extend({
@@ -22,14 +18,7 @@ var WebSQL = exports.Client = ClientBase.extend({
   constructor: function(config) {
     if (config.debug) this.isDebugging = true;
     this.name = config.name || 'knex_database';
-    this.attachGrammars();
     this.connectionSettings = config.connection;
-  },
-
-  // Attach the appropriate grammar definitions onto the current client.
-  attachGrammars: function() {
-    this.grammar = grammar;
-    this.schemaGrammar = schemaGrammar;
   },
 
   // Execute a query on the specified Builder or QueryBuilder

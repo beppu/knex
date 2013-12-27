@@ -11,22 +11,12 @@ var sqlite3 = require('sqlite3');
 var ServerBase      = require('./server').ServerBase;
 var Builder         = require('../lib/builder').Builder;
 var Transaction     = require('../lib/transaction').Transaction;
-var SchemaInterface = require('../lib/schemainterface').SchemaInterface;
 var Promise         = require('../lib/promise').Promise;
-
-var grammar         = require('./sqlite3/grammar').grammar;
-var schemaGrammar   = require('./sqlite3/schemagrammar').schemaGrammar;
 
 // Constructor for the SQLite3Client.
 var SQLite3Client = exports.Client = ServerBase.extend({
 
   dialect: 'sqlite3',
-
-  // Attach the appropriate grammar definitions onto the current client.
-  attachGrammars: function() {
-    this.grammar = grammar;
-    this.schemaGrammar = schemaGrammar;
-  },
 
   // Runs the query on the specified connection, providing the bindings
   // and any other necessary prep work.

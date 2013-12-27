@@ -929,7 +929,6 @@ var ServerBase = module.exports = ClientBase.extend({
   constructor: function(config) {
     if (config.debug) this.isDebugging = true;
     this.name = config.name || 'knex_database';
-    this.attachGrammars();
     this.connectionSettings = config.connection;
   },
 

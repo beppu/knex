@@ -60,7 +60,7 @@ var Knex = function(config) {
 
   // Enable the `Builder('tableName')` syntax, as is used in the main `knex('tableName')`.
   knex.builder = function(tableName) {
-    var builder = new Builder(knex);
+    var builder = new Builder().client(client);
     return tableName ? builder.from(tableName) : builder;
   };
 

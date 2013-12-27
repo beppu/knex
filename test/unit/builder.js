@@ -147,7 +147,7 @@ describe('Builder', function () {
 
   describe('join', function() {
 
-    var JoinClause = require('../../lib/builder/joinclause').JoinClause;
+    var JoinClause = require('../../lib/builder/joinclause');
 
     it('accepts the joining table, the first column, operator, second column, and (optional) type', function() {
       expect(builder.joins).to.have.length(0);

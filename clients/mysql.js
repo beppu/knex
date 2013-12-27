@@ -8,22 +8,13 @@ var _     = require('lodash');
 var mysql = require('mysql');
 
 // All other local project modules needed in this scope.
-var ServerBase        = require('./server').ServerBase;
-var Promise           = require('../lib/promise').Promise;
-
-var grammar           = require('./mysql/grammar').grammar;
-var schemaGrammar     = require('./mysql/schemagrammar').schemaGrammar;
+var ServerBase = require('./server').ServerBase;
+var Promise    = require('../lib/promise').Promise;
 
 // Constructor for the MySQLClient.
 exports.Client = ServerBase.extend({
 
   dialect: 'mysql',
-
-  // Attach the appropriate grammar definitions onto the current client.
-  attachGrammars: function() {
-    this.grammar = grammar;
-    this.schemaGrammar = schemaGrammar;
-  },
 
   // Runs the query on the specified connection, providing the bindings
   // and any other necessary prep work.

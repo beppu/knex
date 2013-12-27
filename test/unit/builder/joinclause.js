@@ -1,4 +1,4 @@
-var JoinClause = require('../../../lib/builder/joinclause').JoinClause;
+var JoinClause = require('../../../lib/builder/joinclause');
 
 describe('JoinClause', function () {
 
