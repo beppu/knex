@@ -11,7 +11,7 @@ var sqlite3 = require('sqlite3');
 var ServerBase      = require('./server').ServerBase;
 var Builder         = require('../lib/builder').Builder;
 var Transaction     = require('../lib/transaction').Transaction;
-var Promise         = require('../lib/promise').Promise;
+var Promise         = require('../lib/promise');
 
 // Constructor for the SQLite3Client.
 var SQLite3Client = exports.Client = ServerBase.extend({

@@ -2,7 +2,7 @@ var isDev         = parseInt(process.env.KNEX_DEV, 10);
 
 var _             = require('lodash');
 var Common        = require('../../lib/common').Common;
-var Raw           = require('../../lib/raw').Raw;
+var Raw           = require('../../lib/raw');
 var Builder       = require('../../lib/builder').Builder;
 var SchemaBuilder = require('../../lib/schemabuilder').SchemaBuilder;
 

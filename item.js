@@ -1,12 +1,13 @@
-var Builder = require('./lib/builder').client('sqlite3');
-var Raw     = require('./lib/raw');
+var knex    = require('./knex').initialize({client: 'sqlite3'});
+var Builder = knex.grammar('mysql');
+
 var chain   = Builder
                 .from('accounts')
                 .column('item1 as item4')
                 .column('item2')
                 .sum('cols')
                 .where('id', '=', 1)
-                .where({i: 1, b: new Raw(2)})
+                .where({i: 1, b: Builder.raw(2)})
                 .join('test_table_two', function() {
                     this.on('accounts.id', '=', 'test_table_two.account_id')
                         .orOn('item.id', '=', '');
@@ -26,5 +27,5 @@ var chain   = Builder
                 // });
 
 console.log(
-  chain.truncate([{id: 1, 'tim': 'cool'}, {id: 2, tim: 'cool'}], 'tim').toString()
+  chain.select('tim').toString()
 );

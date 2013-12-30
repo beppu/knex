@@ -9,7 +9,7 @@ var mysql = require('mysql');
 
 // All other local project modules needed in this scope.
 var ServerBase = require('./server').ServerBase;
-var Promise    = require('../lib/promise').Promise;
+var Promise    = require('../lib/promise');
 
 // Constructor for the MySQLClient.
 exports.Client = ServerBase.extend({

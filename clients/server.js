@@ -3,9 +3,9 @@
 
 var _          = require('lodash');
 
-var ClientBase = require('./base').ClientBase;
+var ClientBase = require('./base');
 var Pool       = require('../lib/pool').Pool;
-var Promise    = require('../lib/promise').Promise;
+var Promise    = require('../lib/promise');
 
 var ServerBase = ClientBase.extend({
 

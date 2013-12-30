@@ -6,7 +6,7 @@ var _       = require('lodash');
 var ClientBase      = require('./base').ClientBase;
 var Builder         = require('../lib/builder').Builder;
 var Transaction     = require('../lib/transaction').Transaction;
-var Promise         = require('../lib/promise').Promise;
+var Promise         = require('../lib/promise');
 
 // Constructor for the SQLite3Client.
 var WebSQL = exports.Client = ClientBase.extend({

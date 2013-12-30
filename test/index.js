@@ -9,7 +9,7 @@ chai.use(require("chai-as-promised"));
 chai.use(require("sinon-chai"));
 chai.should();
 
-var Promise = global.testPromise    = require('../lib/promise').Promise;
+var Promise = global.testPromise    = require('../lib/promise');
 global.expect         = chai.expect;
 global.AssertionError = chai.AssertionError;
 global.Assertion      = chai.Assertion;
@@ -18,19 +18,19 @@ global.assert         = chai.assert;
 Promise.longStackTraces();
 
 // Unit tests
-describe('Unit Tests', function() {
-  require('./unit/knex');
-  require('./unit/common');
-  require('./unit/builder');
-  require('./unit/builder/joinclause');
-  require('./unit/raw');
-  require('./unit/transaction');
-  require('./unit/clients/pool');
-  require('./unit/clients/base');
-  require('./unit/clients/mysql');
-  require('./unit/clients/postgres');
-  require('./unit/clients/sqlite3');
-});
+// describe('Unit Tests', function() {
+//   require('./unit/knex');
+//   require('./unit/common');
+//   require('./unit/builder');
+//   require('./unit/builder/joinclause');
+//   require('./unit/raw');
+//   require('./unit/transaction');
+//   require('./unit/clients/pool');
+//   require('./unit/clients/base');
+//   require('./unit/clients/mysql');
+//   require('./unit/clients/postgres');
+//   require('./unit/clients/sqlite3');
+// });
 
 // Integration Tests
 describe('Integration Tests', function() {
