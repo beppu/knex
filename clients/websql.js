@@ -3,13 +3,13 @@
 var _       = require('lodash');
 
 // All other local project modules needed in this scope.
-var ClientBase      = require('./base').ClientBase;
+var ClientBase      = require('./base');
 var Builder         = require('../lib/builder').Builder;
-var Transaction     = require('../lib/transaction').Transaction;
+var Transaction     = require('../lib/transaction');
 var Promise         = require('../lib/promise');
 
 // Constructor for the SQLite3Client.
-var WebSQL = exports.Client = ClientBase.extend({
+var WebSQL = module.exports = ClientBase.extend({
 
   dialect: 'websql',
 

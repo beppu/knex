@@ -1,4 +1,4 @@
-var Transaction = require('../../lib/transaction').Transaction;
+var Transaction = require('../../lib/transaction');
 var Promise     = testPromise;
 
 var conn = {

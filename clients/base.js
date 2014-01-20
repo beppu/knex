@@ -1,6 +1,6 @@
 // ClientBase
 // ----------
-var Helpers = require('../lib/helpers').Helpers;
+var Helpers = require('../lib/helpers');
 
 // The `ClientBase` is assumed as the object that all database `clients`
 // inherit from, and is used in an `instanceof` check when initializing the

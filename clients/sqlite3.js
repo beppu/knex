@@ -8,13 +8,12 @@ var _       = require('lodash');
 var sqlite3 = require('sqlite3');
 
 // All other local project modules needed in this scope.
-var ServerBase      = require('./server').ServerBase;
-var Builder         = require('../lib/builder').Builder;
-var Transaction     = require('../lib/transaction').Transaction;
-var Promise         = require('../lib/promise');
+var ServerBase  = require('./server');
+var Transaction = require('../lib/transaction');
+var Promise     = require('../lib/promise');
 
 // Constructor for the SQLite3Client.
-var SQLite3Client = exports.Client = ServerBase.extend({
+var SQLite3Client = module.exports = ServerBase.extend({
 
   dialect: 'sqlite3',
 
@@ -125,6 +124,7 @@ var SQLite3Client = exports.Client = ServerBase.extend({
         query('SELECT * FROM "__migrate__' + sql.name + '"'),
       ]);
     }).spread(function(createTable, selected) {
+      throw new Error('fix me');
       var qb = new Builder(builder.knex).transacting(trx);
           qb.table = builder.table;
       return Promise.all([

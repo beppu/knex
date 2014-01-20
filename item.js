@@ -1,5 +1,5 @@
-var knex    = require('./knex').initialize({client: 'sqlite3'});
-var Builder = knex.grammar('mysql');
+// var knex    = .initialize({client: 'sqlite3'});
+var Builder = require('./knex').dialect('sqlite3');
 
 var chain   = Builder
                 .from('accounts')
@@ -16,7 +16,7 @@ var chain   = Builder
                 .orderBy(['name', 'item', 'value'], 'asc')
                 .orderBy('otherVal', 'desc')
                 .transacting({})
-                // .forShare()
+                .forShare()
                 .having('items', '<', 300)
                 .limit(2)
                 .offset(1);

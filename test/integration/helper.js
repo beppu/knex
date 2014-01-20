@@ -3,7 +3,7 @@ var isDev         = parseInt(process.env.KNEX_DEV, 10);
 var _             = require('lodash');
 var Common        = require('../../lib/common').Common;
 var Raw           = require('../../lib/raw');
-var Builder       = require('../../lib/builder').Builder;
+var Builder       = require('../../lib/builder/interface');
 var SchemaBuilder = require('../../lib/schemabuilder').SchemaBuilder;
 
 var fs            = require('fs');
@@ -16,8 +16,13 @@ var counters   = {};
 
 exports.setLib = function(context) {
 
-  Raw.prototype.logMe = SchemaBuilder.prototype.logMe = Builder.prototype.logMe = function(logWhat) {
+  Raw.prototype.logMe = SchemaBuilder.prototype.logMe = function(logWhat) {
     this.isLogging = logWhat || true;
+    return this;
+  };
+
+  Builder.prototype.logMe = function(logWhat) {
+    this.setAttribute('isLogging', logWhat);
     return this;
   };
 
@@ -26,8 +31,9 @@ exports.setLib = function(context) {
     this._promise || (this._promise = this.client.query(this));
 
     var then = this;
+    var isLogging = this.isLogging || (this.attributes && this.attributes['isLogging']);
 
-    if (this.isLogging) {
+    if (isLogging) {
 
       var title   = context.test.title;
       var parent  = generateTitle(context.test).pop();
@@ -38,7 +44,7 @@ exports.setLib = function(context) {
       }
 
       // If we're not only logging the result for this query...
-      if (this.isLogging !== 'result') {
+      if (isLogging !== 'result') {
         var bindings = this.getBindings();
         checkIt('sql', title, parent, dialect, {sql: this.toSql(), bindings: this.getBindings()});
       }
@@ -47,7 +53,7 @@ exports.setLib = function(context) {
     return this._promise.tap(function(resp) {
 
       // If we're not only logging the sql for this query...
-      if (then.isLogging && then.isLogging !== 'sql') {
+      if (isLogging && isLogging !== 'sql') {
         checkIt('result', title, parent, dialect, {result: resp});
       }
 

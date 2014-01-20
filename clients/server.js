@@ -7,7 +7,7 @@ var ClientBase = require('./base');
 var Pool       = require('../lib/pool').Pool;
 var Promise    = require('../lib/promise');
 
-var ServerBase = ClientBase.extend({
+var ServerBase = module.exports = ClientBase.extend({
 
   // Pass a config object into the constructor,
   // which then initializes the pool and

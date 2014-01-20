@@ -8,11 +8,11 @@ var _    = require('lodash');
 var pg   = require('pg');
 
 // All other local project modules needed in this scope.
-var ServerBase = require('./server').ServerBase;
+var ServerBase = require('./server');
 var Promise    = require('../lib/promise');
 
 // Constructor for the PostgreSQL Client
-exports.Client = ServerBase.extend({
+module.exports = ServerBase.extend({
 
   dialect: 'postgresql',
 
