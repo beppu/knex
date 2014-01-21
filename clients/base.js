@@ -9,4 +9,4 @@ var Helpers = require('../lib/helpers');
 var ClientBase = module.exports = function() {};
 
 // Grab the standard `Object.extend` as popularized by Backbone.js.
-ClientBase.extend = Helpers.extend;
+ClientBase.extend = require('simple-extend');

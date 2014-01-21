@@ -27,5 +27,5 @@ var chain   = Builder
                 // });
 
 console.log(
-  chain.select('tim').toString()
+  chain.select('tim').toSql()
 );
