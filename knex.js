@@ -14,20 +14,21 @@ var _ = require('lodash');
 // the correct client reference & grammar.
 var Raw        = require('./lib/raw');
 var Helpers    = require('./lib/helpers');
-var ClientBase = require('./clients/base');
+var ClientBase = require('./lib/clients/base');
 
 // Lazy-loaded modules.
 var Transaction, Schema, Migrate;
+var Knex = module.exports;
 
 // The client names we'll allow in the `{name: lib}` pairing.
 var Clients = Knex.Clients = {
-  'mysql'      : './lib/clients/mysql.js',
-  'pg'         : './lib/clients/postgres.js',
-  'postgres'   : './lib/clients/postgres.js',
-  'postgresql' : './lib/clients/postgres.js',
-  'sqlite'     : './lib/clients/sqlite3.js',
-  'sqlite3'    : './lib/clients/sqlite3.js',
-  'websql'     : './lib/clients/websql.js'
+  'mysql'      : './lib/clients/mysql',
+  'pg'         : './lib/clients/postgres',
+  'postgres'   : './lib/clients/postgres',
+  'postgresql' : './lib/clients/postgres',
+  'sqlite'     : './lib/clients/sqlite3',
+  'sqlite3'    : './lib/clients/sqlite3',
+  'websql'     : './lib/clients/websql'
 };
 
 // Create a new "knex" instance with the appropriate configured client.

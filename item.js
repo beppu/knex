@@ -1,6 +1,6 @@
 var Knex = require('./knex');
 
-var knex = Knex.dialect('sqlite3');
+var knex = Knex.initialize({client: 'sqlite3'});
 // var knex = Knex.initialize({
 //     client: 'sqlite3',
 //     database: {
