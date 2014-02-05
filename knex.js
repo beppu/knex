@@ -14,96 +14,49 @@ var _ = require('lodash');
 // the correct client reference & grammar.
 var Raw        = require('./lib/raw');
 var Helpers    = require('./lib/helpers');
-var Builder    = require('./lib/builder');
-var Promise    = require('./lib/promise');
 var ClientBase = require('./clients/base');
 
-var Transaction, SchemaBuilder;
-
-// The `Knex` module, taking either a fully initialized
-// database client, or a configuration to initialize one. This is something
-// you'll typically only want to call once per application cycle.
-var Knex = module.exports = function(tableName) {
-  if (!(this instanceof Knex)) {
-    return new this(tableName);
-  }
-  this.__builder = this.__base();
-
-  // If the tableName has been specified,
-  // pass it to the builder chain.
-  if (tableName) {
-    this.__builder = this.__builder.table(tableName);
-  }
-};
-
-Knex.prototype = {
-
-  // Keep in sync with package.json
-  VERSION: '0.5.2',
-
-  // Create a new builder base.
-  __base: function() {
-    return new Builder;
-  }
-
-};
-
-// Method to run a new `Raw` query on the current client.
-Knex.raw = Knex.prototype.raw = function(sql, bindings) {
-  return new Raw(sql, bindings);
-};
-
-// Allow chaining methods from the root object, before
-// any other information is specified.
-_.each(_.keys(Builder.prototype), function(method) {
-  Knex.prototype[method] = Knex[method] = function() {
-    var builder;
-    if (!(this instanceof Knex)) {
-      var instance = new this();
-      builder = instance.__builder;
-    } else {
-      builder = this.__builder;
-    }
-    return builder[method].apply(builder, arguments);
-  };
-});
+// Lazy-loaded modules.
+var Transaction, Schema, Migrate;
 
 // The client names we'll allow in the `{name: lib}` pairing.
 var Clients = Knex.Clients = {
-  'mysql'      : './clients/mysql.js',
-  'pg'         : './clients/postgres.js',
-  'postgres'   : './clients/postgres.js',
-  'postgresql' : './clients/postgres.js',
-  'sqlite'     : './clients/sqlite3.js',
-  'sqlite3'    : './clients/sqlite3.js',
-  'websql'     : './clients/websql.js'
+  'mysql'      : './lib/clients/mysql.js',
+  'pg'         : './lib/clients/postgres.js',
+  'postgres'   : './lib/clients/postgres.js',
+  'postgresql' : './lib/clients/postgres.js',
+  'sqlite'     : './lib/clients/sqlite3.js',
+  'sqlite3'    : './lib/clients/sqlite3.js',
+  'websql'     : './lib/clients/websql.js'
 };
-
-// Used primarily to type-check a potential `Knex` client in `Bookshelf.js`,
-// by examining whether the object's `client` is an `instanceof Knex.ClientBase`.
-Knex.ClientBase = ClientBase;
-
-// Used as the dummy constructor for individual instances.
-function knex() {}
-
-// All of the publicly accessible schema methods, to prevent loading the
-// schema javascript unless it's actually used.
-var schemaMethods = ['table', 'createTable', 'dropTable',
-  'dropTableIfExists',  'renameTable', 'hasTable', 'hasColumn'];
 
 // Create a new "knex" instance with the appropriate configured client.
 Knex.initialize = function(config) {
   var Dialect, client;
-  var KnexInstance = function() {
-    Knex.apply(this, arguments);
-  };
-  for (var key in Knex) {
-    if (key !== 'initialize' && _.has(Knex, key)) {
-      KnexInstance[key] = Knex[key];
-    }
+
+  // The object we're potentially using to kick off an
+  // initial chain. It is assumed that `knex` isn't a
+  // constructor, so we have no reference to 'this' just
+  // in case it's called with `new`.
+  function knex(tableName) {
+    return tableName ? knex.table(tableName) : knex;
   }
 
-  // Check the config
+  // The `__knex__` is used if you need to duck-type check whether this
+  // is a knex builder, without a full on `instanceof` check.
+  knex.VERSION = knex.__knex__  = '0.6.0';
+  knex.raw = function knex$raw() {
+    return new Raw(sql, bindings);
+  };
+
+  // Runs a new transaction, taking a container and returning a promise
+  // for when the transaction is resolved.
+  knex.transaction = function knex$transaction(container) {
+    Transaction = Transaction || require('./lib/transaction');
+    return new Transaction(client).run(container);
+  };
+
+  // Build the "client"
   if (config instanceof ClientBase) {
     client = config;
   } else {
@@ -115,37 +68,34 @@ Knex.initialize = function(config) {
     client  = new Dialect(config);
   }
 
-  KnexInstance.client = client;
+  // The "query builder" is essentially just a `fluent-chain` object, which
+  // passes through to the "client" once it's ready to coerce.
+  var Query = require('./lib/query')(client);
 
-  knex.prototype = Knex.prototype;
-  KnexInstance.prototype = new knex;
-  KnexInstance.prototype.constructor = KnexInstance;
+  // Allow chaining methods from the root object, before
+  // any other information is specified.
+  _.each(_.keys(Query.prototype), function(method) {
+    knex[method] = function() {
+      var builder = (this instanceof Query) ? this : new Query();
+      return builder[method].apply(builder, arguments);
+    };
+  });
+  knex.client = client;
 
-  // Set the base builder instance for this instance.
-  KnexInstance.prototype.__base = function() {
-    return Builder.client(client);
-  };
-
-  // Runs a new transaction, taking a container and returning a promise
-  // for when the transaction is resolved.
-  KnexInstance.transaction = function(container) {
-    Transaction = Transaction || require('./lib/transaction');
-    return new Transaction(client).run(container);
-  };
-
-  // Main namespaces for key library components.
-  var schema  = KnexInstance.schema  = {};
-  var migrate = KnexInstance.migrate = {};
+  // Namespaces for additional library components.
+  var schema  = knex.schema  = {};
+  var migrate = knex.migrate = {};
 
   // Attach each of the `Schema` "interface" methods directly onto to `knex.schema` namespace, e.g.:
   // `knex.schema.table('tableName', function() {...`
   // `knex.schema.createTable('tableName', function() {...`
   // `knex.schema.dropTableIfExists('tableName');`
-  _.each(schemaMethods, function(val, key) {
-    KnexInstance[key] = schema[key] = function(tableName) {
-      SchemaBuilder = SchemaBuilder || require('./schema');
-      var builder = new SchemaBuilder(client, key, tableName);
-      return builder[key].apply(builder, _.rest(arguments));
+  _.each(['table', 'createTable', 'editTable', 'dropTable',
+    'dropTableIfExists',  'renameTable', 'hasTable', 'hasColumn'], function(key) {
+    schema[key] = function(tableName) {
+      Schema = Schema || require('./lib/schema');
+      var builder = Schema.client(client);
+      return builder[key].apply(builder, arguments);
     };
   });
 
@@ -153,12 +103,12 @@ Knex.initialize = function(config) {
   // knex.migrate.latest().then(...
   // knex.migrate.currentVersion(...
   _.each(['make', 'latest', 'rollback', 'currentVersion'], function(method) {
-    KnexInstance.migrate[method] = function() {
-      var Migrate = require('./lib/migrate');
+    migrate[method] = function() {
+      Migrate = Migrate || require('./lib/migrate');
       var migration = new Migrate(base);
       return migration[method].apply(migration, arguments);
     };
   });
 
-  return KnexInstance;
+  return knex;
 };

@@ -1,31 +1,52 @@
-// var knex    = .initialize({client: 'sqlite3'});
-var Builder = require('./knex').dialect('sqlite3');
+var Knex = require('./knex');
 
-var chain   = Builder
-                .from('accounts')
-                .column('item1 as item4')
-                .column('item2')
-                .sum('cols')
-                .where('id', '=', 1)
-                .where({i: 1, b: Builder.raw(2)})
-                .join('test_table_two', function() {
-                    this.on('accounts.id', '=', 'test_table_two.account_id')
-                        .orOn('item.id', '=', '');
-                })
-                .groupBy('items')
-                .orderBy(['name', 'item', 'value'], 'asc')
-                .orderBy('otherVal', 'desc')
-                .transacting({})
-                .forShare()
-                .having('items', '<', 300)
-                .limit(2)
-                .offset(1);
+var knex = Knex.dialect('sqlite3');
+// var knex = Knex.initialize({
+//     client: 'sqlite3',
+//     database: {
+//       filename: 'memory'
+//     }
+// });
 
-                // .orWhere('id', '=', Builder.select('item as value').from('items').where('id', 2))
-                // .orWhere(function() {
-                //     this.where('one', '=', 2);
-                // });
+// var creating = knex.schema
+//   .dropTableIfExists('items')
+//   .dropTable('newTable')
+//   .createTable('items', function(t) {
+//     t.bigIncrements();
+//     t.string('firstName').unique();
+//     t.text('firstName').defaultTo('Tim');
+//     t.dateTime('new_table').defaultTo(Knex.raw('CURRENT_TIMESTAMP'));
+//   });
+
+var chain = knex
+  .from('accounts')
+  .column('item1 as item4')
+  .column('item2')
+  .sum('cols')
+  .where('id', '=', 1)
+  .where({i: 1, b: knex.raw(2)})
+  .join('test_table_two', function() {
+      this.on('accounts.id', '=', 'test_table_two.account_id')
+          .orOn('item.id', '=', '');
+  })
+  .groupBy('items')
+  .orderBy(['name', 'item', 'value'], 'asc')
+  .orderBy('otherVal', 'desc')
+  .transacting({})
+  .forShare()
+  .having('items', '<', 300)
+  .limit(2)
+  .offset(1);
+
+  // .orWhere('id', '=', Builder.select('item as value').from('items').where('id', 2))
+  // .orWhere(function() {
+  //     this.where('one', '=', 2);
+  // });
+
+// console.log(chain)
 
 console.log(
-  chain.select('tim').toSql()
+  chain.toSql()
+  // ,
+  // creating.toSql()
 );
