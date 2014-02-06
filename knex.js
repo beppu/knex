@@ -6,6 +6,14 @@
 //     For details and documentation:
 //     http://knexjs.org
 
+// The "Knex" object we're exporting is just a passthrough to `Knex.initialize`.
+function Knex() {
+  return Knex.initialize.apply(null, arguments);
+}
+Knex.raw = function Knex$raw(sql, bindings) {
+  return new Raw(sql, bindings);
+};
+
 // Base library dependencies of the app.
 var _ = require('lodash');
 
@@ -18,7 +26,6 @@ var ClientBase = require('./lib/clients/base');
 
 // Lazy-loaded modules.
 var Transaction, Schema, Migrate;
-var Knex = module.exports;
 
 // The client names we'll allow in the `{name: lib}` pairing.
 var Clients = Knex.Clients = {
@@ -94,9 +101,8 @@ Knex.initialize = function(config) {
   _.each(['table', 'createTable', 'editTable', 'dropTable',
     'dropTableIfExists',  'renameTable', 'hasTable', 'hasColumn'], function(key) {
     schema[key] = function(tableName) {
-      Schema = Schema || require('./lib/schema');
-      var builder = Schema.client(client);
-      return builder[key].apply(builder, arguments);
+      Schema = Schema || require('./lib/schema')(client);
+      return Schema[key].apply(Schema, arguments);
     };
   });
 
@@ -113,3 +119,5 @@ Knex.initialize = function(config) {
 
   return knex;
 };
+
+module.exports = Knex;
