@@ -19,13 +19,19 @@ Promise.longStackTraces();
 
 var knex = require('../knex');
 
+var mysql = knex({
+  client: 'mysql'
+});
+var postgres = knex({
+  client: 'postgres'
+});
 var sqlite3 = knex({
   client: 'sqlite3'
 });
 
-require('./newunit/tablecompiler/sqlite3')(sqlite3.client);
-
-
+require('./newunit/schema/postgresql')(postgres.client);
+require('./newunit/schema/sqlite3')(sqlite3.client);
+require('./newunit/schema/mysql')(mysql.client);
 
 // Unit tests
 // describe('Unit Tests', function() {
