@@ -25,7 +25,7 @@ var Helpers    = require('./lib/helpers');
 var ClientBase = require('./lib/clients/base');
 
 // Lazy-loaded modules.
-var Transaction, Schema, Migrate;
+var Transaction, Migrate;
 
 // The client names we'll allow in the `{name: lib}` pairing.
 var Clients = Knex.Clients = {
@@ -101,8 +101,9 @@ Knex.initialize = function(config) {
   _.each(['table', 'createTable', 'editTable', 'dropTable',
     'dropTableIfExists',  'renameTable', 'hasTable', 'hasColumn'], function(key) {
     schema[key] = function(tableName) {
-      Schema = Schema || require('./lib/schema')(client);
-      return Schema[key].apply(Schema, arguments);
+      client.SchemaBuilder = client.SchemaBuilder || client.initSchema();
+      var builder = new client.SchemaBuilder();
+      return builder[key].apply(Schema, arguments);
     };
   });
 

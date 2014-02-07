@@ -17,6 +17,16 @@ global.assert         = chai.assert;
 
 Promise.longStackTraces();
 
+var knex = require('../knex');
+
+var sqlite3 = knex({
+  client: 'sqlite3'
+});
+
+require('./newunit/tablecompiler/sqlite3')(sqlite3.client);
+
+
+
 // Unit tests
 // describe('Unit Tests', function() {
 //   require('./unit/knex');
@@ -33,24 +43,24 @@ Promise.longStackTraces();
 // });
 
 // Integration Tests
-describe('Integration Tests', function() {
+// describe('Integration Tests', function() {
 
-  var helper = require('./integration/helper');
+//   var helper = require('./integration/helper');
 
-  before(function() {
-    helper.setLib(this);
-  });
+//   before(function() {
+//     helper.setLib(this);
+//   });
 
-  require('./integration/knex');
+//   require('./integration/knex');
 
-  after(function() {
-    helper.writeResult();
-  });
+//   after(function() {
+//     helper.writeResult();
+//   });
 
-});
+// });
 
 // Benchmarks
-describe('Benchmarks', function() {
+// describe('Benchmarks', function() {
 
 
-});
+// });
