@@ -14,38 +14,38 @@ module.exports = function(postgresclient, mysqlclient, sqlite3client) {
 
     var chain;
 
-    it("basic select", function () {
+    it("basic select", function() {
       chain = sql.select('*').from('users').toSql();
       expect(chain.sql).to.equal('select * from "users"');
     });
 
-    it("adding selects", function () {
+    it("adding selects", function() {
       chain = sql.select('foo').select('bar').select(['baz', 'boom']).from('users').toSql();
       expect(chain.sql).to.equal('select "foo", "bar", "baz", "boom" from "users"');
     });
 
-    it("basic select distinct", function () {
+    it("basic select distinct", function() {
       chain = sql.distinct().select('foo', 'bar').from('users').toSql();
       expect(chain.sql).to.equal('select distinct "foo", "bar" from "users"');
     });
 
-    it("basic alias", function () {
+    it("basic alias", function() {
       chain = sql.select('foo as bar').from('users').toSql();
       expect(chain.sql).to.equal('select "foo" as "bar" from "users"');
     });
 
-    it("basic table wrapping", function () {
+    it("basic table wrapping", function() {
       chain = sql.select('*').from('public.users').toSql();
       expect(chain.sql).to.equal('select * from "public"."users"');
     });
 
-    it("basic wheres", function () {
+    it("basic wheres", function() {
       chain = sql.select('*').from('users').where('id', '=', 1).toSql();
       expect(chain.sql).to.equal('select * from "users" where "id" = ?');
       expect(chain.bindings).to.eql([1]);
     });
 
-    it("where betweens", function () {
+    it("where betweens", function() {
       chain = sql.select('*').from('users').whereBetween('id', [1, 2]).toSql();
       expect(chain.sql).to.equal('select * from "users" where "id" between ? and ?');
       expect(chain.bindings).to.eql([1, 2]);
@@ -55,25 +55,25 @@ module.exports = function(postgresclient, mysqlclient, sqlite3client) {
       expect(chain.bindings).to.eql([1, 2]);
     });
 
-    it("basic or wheres", function () {
+    it("basic or wheres", function() {
       chain = sql.select('*').from('users').where('id', '=', 1).orWhere('email', '=', 'foo').toSql();
       expect(chain.sql).to.equal('select * from "users" where "id" = ? or "email" = ?');
       expect(chain.bindings).to.eql([1, 'foo']);
     });
 
-    it("raw wheres", function () {
+    it("raw wheres", function() {
       chain = sql.select('*').from('users').whereRaw('id = ? or email = ?', [1, 'foo']).toSql();
       expect(chain.sql).to.equal('select * from "users" where id = ? or email = ?');
       expect(chain.bindings).to.eql([1, 'foo']);
     });
 
-    it("raw or wheres", function () {
+    it("raw or wheres", function() {
       chain = sql.select('*').from('users').where('id', '=', 1).orWhereRaw('email = ?', ['foo']).toSql();
       expect(chain.sql).to.equal('select * from "users" where "id" = ? or email = ?');
       expect(chain.bindings).to.eql([1, 'foo']);
     });
 
-    it("basic where ins", function () {
+    it("basic where ins", function() {
       chain = sql.select('*').from('users').whereIn('id', [1, 2, 3]).toSql();
       expect(chain.sql).to.equal('select * from "users" where "id" in (?, ?, ?)');
       expect(chain.bindings).to.eql([1, 2, 3]);
@@ -83,7 +83,7 @@ module.exports = function(postgresclient, mysqlclient, sqlite3client) {
       expect(chain.bindings).to.eql([1, 1, 2, 3]);
     });
 
-    it("basic where not ins", function () {
+    it("basic where not ins", function() {
       chain = sql.select('*').from('users').whereNotIn('id', [1, 2, 3]).toSql();
       expect(chain.sql).to.equal('select * from "users" where "id" not in (?, ?, ?)');
       expect(chain.bindings).to.eql([1, 2, 3]);
@@ -93,7 +93,7 @@ module.exports = function(postgresclient, mysqlclient, sqlite3client) {
       expect(chain.bindings).to.eql([1, 1, 2, 3]);
     });
 
-    it("unions", function () {
+    it("unions", function() {
       chain = sql.select('*').from('users').where('id', '=', 1);
       chain = chain.union(sql.select('*').from('users').where('id', '=', 2)).toSql();
       expect(chain.sql).to.equal('select * from "users" where "id" = ? union select * from "users" where "id" = ?');
@@ -105,14 +105,14 @@ module.exports = function(postgresclient, mysqlclient, sqlite3client) {
       expect(chain.bindings).to.eql([1, 2]);
     });
 
-    it("union alls", function () {
+    it("union alls", function() {
       chain = sql.select('*').from('users').where('id', '=', 1);
       chain = chain.unionAll(sql.select('*').from('users').where('id', '=', 2)).toSql();
       expect(chain.sql).to.equal('select * from "users" where "id" = ? union all select * from "users" where "id" = ?');
       expect(chain.bindings).to.eql([1, 2]);
     });
 
-    it("multiple unions", function () {
+    it("multiple unions", function() {
       chain = sql.select('*').from('users').where('id', '=', 1);
       chain = chain.union(sql.select('*').from('users').where('id', '=', 2));
       chain = chain.union(sql.select('*').from('users').where('id', '=', 3)).toSql();
@@ -120,7 +120,7 @@ module.exports = function(postgresclient, mysqlclient, sqlite3client) {
       expect(chain.bindings).to.eql([1, 2, 3]);
     });
 
-    it("multiple union alls", function () {
+    it("multiple union alls", function() {
       chain = sql.select('*').from('users').where('id', '=', 1);
       chain = chain.unionAll(sql.select('*').from('users').where('id', '=', 2));
       chain = chain.unionAll(sql.select('*').from('users').where('id', '=', 3)).toSql();
@@ -128,7 +128,7 @@ module.exports = function(postgresclient, mysqlclient, sqlite3client) {
       expect(chain.bindings).to.eql([1, 2, 3]);
     });
 
-    it("sub select where ins", function () {
+    it("sub select where ins", function() {
       chain = sql.select('*').from('users').whereIn('id', function(qb) {
         qb.select('id').from('users').where('age', '>', 25).limit(3);
       }).toSql();
@@ -142,7 +142,7 @@ module.exports = function(postgresclient, mysqlclient, sqlite3client) {
       expect(chain.bindings).to.eql([25, 3]);
     });
 
-    it("basic where nulls", function () {
+    it("basic where nulls", function() {
       chain = sql.select('*').from('users').whereNull('id').toSql();
       expect(chain.sql).to.equal('select * from "users" where "id" is null');
       expect(chain.bindings).to.eql([]);
@@ -152,7 +152,7 @@ module.exports = function(postgresclient, mysqlclient, sqlite3client) {
       expect(chain.bindings).to.eql([1]);
     });
 
-    it("basic where not nulls", function () {
+    it("basic where not nulls", function() {
       chain = sql.select('*').from('users').whereNotNull('id').toSql();
       expect(chain.sql).to.equal('select * from "users" where "id" is not null');
       expect(chain.bindings).to.eql([]);
@@ -162,23 +162,17 @@ module.exports = function(postgresclient, mysqlclient, sqlite3client) {
       expect(chain.bindings).to.eql([1]);
     });
 
-    it("group bys", function () {
+    it("group bys", function() {
       chain = sql.select('*').from('users').groupBy('id', 'email').toSql();
       expect(chain.sql).to.equal('select * from "users" group by "id", "email"');
     });
 
-    // it("order bys", function () {
-    //   chain = sql.select('*').from('users').orderBy('email').orderBy('age', 'desc');
-    //   var builder = chain.toSql();
-    //   expect(chain.sql).to.equal('select * from "users" order by "email" asc, "age" desc');
+    it("order bys", function() {
+      chain = sql.select('*').from('users').orderBy('email').orderBy('age', 'desc').toSql();
+      expect(chain.sql).to.equal('select * from "users" order by "email" asc, "age" desc');
+    });
 
-    //   chain = sql.select('*').from('users').orderBy('email').orderByRaw('"age" ? desc', {foo: 'bar'});
-    //   builder = chain.toSql();
-    //   expect(chain.sql).to.equal('select * from "users" order by "email" asc, "age" ? desc');
-    //   expect(chain.bindings).to.eql({foo: 'bar'});
-    // });
-
-    it("havings", function () {
+    it("havings", function() {
       chain = sql.select('*').from('users').having('email', '>', 1).toSql();
       expect(chain.sql).to.equal('select * from "users" having "email" > ?');
 
@@ -189,7 +183,7 @@ module.exports = function(postgresclient, mysqlclient, sqlite3client) {
       expect(chain.sql).to.equal('select "email" as "foo_email" from "users" having "foo_email" > ?');
     });
 
-    it("raw havings", function () {
+    it("raw havings", function() {
       chain = sql.select('*').from('users').havingRaw('user_foo < user_bar').toSql();
       expect(chain.sql).to.equal('select * from "users" having user_foo < user_bar');
 
@@ -197,7 +191,7 @@ module.exports = function(postgresclient, mysqlclient, sqlite3client) {
       expect(chain.sql).to.equal('select * from "users" having "baz" = ? or user_foo < user_bar');
     });
 
-    it("limits and offsets", function () {
+    it("limits and offsets", function() {
       chain = sql.select('*').from('users').offset(5).limit(10).toSql();
       expect(chain.sql).to.equal('select * from "users" limit ? offset ?');
       expect(chain.bindings).to.eql([10, 5]);
@@ -215,13 +209,13 @@ module.exports = function(postgresclient, mysqlclient, sqlite3client) {
       // expect(chain.sql).to.equal('select * from "users" limit 15 offset 0');
     });
 
-    it("where shortcut", function () {
+    it("where shortcut", function() {
       chain = sql.select('*').from('users').where('id', 1).orWhere('name', 'foo').toSql();
       expect(chain.sql).to.equal('select * from "users" where "id" = ? or "name" = ?');
       expect(chain.bindings).to.eql([1, 'foo']);
     });
 
-    it("nested wheres", function () {
+    it("nested wheres", function() {
       chain = sql.select('*').from('users').where('email', '=', 'foo').orWhere(function($q)
       {
         $q.where('name', '=', 'bar').where('age', '=', 25);
@@ -230,7 +224,7 @@ module.exports = function(postgresclient, mysqlclient, sqlite3client) {
       expect(chain.bindings).to.eql(['foo', 'bar', 25]);
     });
 
-    it("full sub selects", function () {
+    it("full sub selects", function() {
       chain = sql.select('*').from('users').where('email', '=', 'foo').orWhere('id', '=', function(qb) {
         qb.select(new Raw('max(id)')).from('users').where('email', '=', 'bar');
       }).toSql();
@@ -238,7 +232,7 @@ module.exports = function(postgresclient, mysqlclient, sqlite3client) {
       expect(chain.bindings).to.eql(['foo', 'bar']);
     });
 
-    it("where exists", function () {
+    it("where exists", function() {
       chain = sql.select('*').from('orders').whereExists(function(qb) {
         qb.select('*').from('products').where('products.id', '=', new Raw('"orders"."id"'));
       }).toSql();
@@ -260,24 +254,24 @@ module.exports = function(postgresclient, mysqlclient, sqlite3client) {
       expect(chain.sql).to.equal('select * from "orders" where "id" = ? or not exists (select * from "products" where "products"."id" = "orders"."id")');
     });
 
-    it("basic joins", function () {
+    it("basic joins", function() {
       chain = sql.select('*').from('users').join('contacts', 'users.id', '=', 'contacts.id').leftJoin('photos', 'users.id', '=', 'photos.id').toSql();
       expect(chain.sql).to.equal('select * from "users" inner join "contacts" on "users"."id" = "contacts"."id" left join "photos" on "users"."id" = "photos"."id"');
     });
 
-    it("complex join", function () {
+    it("complex join", function() {
       chain = sql.select('*').from('users').join('contacts', function(qb) {
         qb.on('users.id', '=', 'contacts.id').orOn('users.name', '=', 'contacts.name');
       }).toSql();
       expect(chain.sql).to.equal('select * from "users" inner join "contacts" on "users"."id" = "contacts"."id" or "users"."name" = "contacts"."name"');
     });
 
-    it("raw expressions in select", function () {
+    it("raw expressions in select", function() {
       chain = sql.select(new Raw('substr(foo, 6)')).from('users').toSql();
       expect(chain.sql).to.equal('select substr(foo, 6) from "users"');
     });
 
-    // it("list methods gets array of column values", function () {
+    // it("list methods gets array of column values", function() {
     //   chain = sql.getConnection().shouldReceive('select').once().andReturn(array({foo: 'bar'}, {'foo': 'baz'}));
     //   $builder.getProcessor().shouldReceive('processSelect').once().with($builder, array({foo: 'bar'}, {foo: 'baz'})).andReturnUsing(function($query, $results)
     //   {
@@ -295,14 +289,14 @@ module.exports = function(postgresclient, mysqlclient, sqlite3client) {
     // //   equal(array(1 => 'bar', 10 => 'baz'), $results);
     // });
 
-    // it("pluck method returns single column", function () {
+    // it("pluck method returns single column", function() {
     //   chain = sql.getConnection().shouldReceive('select').once().with('select "foo" from "users" where "id" = ? limit 1', [1]).andReturn(array({foo: 'bar'}));
     //   $builder.getProcessor().shouldReceive('processSelect').once().with($builder, array({foo: 'bar'})).andReturn(array({foo: 'bar'}));
     //   $results = $builder.from('users').where('id', '=', 1).pluck('foo');
     //   equal('bar', $results);
     // });
 
-    it("aggregate functions", function () {
+    it("aggregate functions", function() {
       chain = sql.from('users').count().toSql();
       expect(chain.sql).to.equal('select count(*) from "users"');
 
@@ -319,65 +313,49 @@ module.exports = function(postgresclient, mysqlclient, sqlite3client) {
       expect(chain.sql).to.equal('select sum("id") from "users"');
     });
 
-    it("insert method", function () {
+    it("insert method", function() {
       var value = sql.into('users').insert({'email': 'foo'}).toSql();
       expect(value.sql).to.equal('insert into "users" ("email") values (?)');
       expect(value.bindings).to.eql(['foo']);
     });
 
-    it("SQLite3 multiple inserts", function () {
+    it("SQLite3 multiple inserts", function() {
       chain = sqlite3.from('users').insert([{email: 'foo', name: 'taylor'}, {email: 'bar', name: 'dayle'}]).toSql();
       expect(chain.sql).to.equal('insert into "users" ("email", "name") select ? as "email", ? as "name" union all select ? as "email", ? as "name"');
       expect(chain.bindings).to.eql(['foo', 'taylor', 'bar', 'dayle']);
     });
 
-    // it("insert get id method", function () {
-    //   chain = sql.getProcessor().shouldReceive('processInsertGetId').once().with($builder, 'insert into "users" ("email") values (?)', array('foo'), 'id').andReturn(1);
-    //   // $result = $builder.from('users').insertGetId(array('email' => 'foo'), 'id');
-    //   equal(1, $result);
-    // });
-
-    // it("insert get id method removes expressions", function () {
-    //   chain = sql.getProcessor().shouldReceive('processInsertGetId').once().with($builder, 'insert into "users" ("email", "bar") values (?, bar)', array('foo'), 'id').andReturn(1);
-    //   // // $result = $builder.from('users').insertGetId(array('email' => 'foo', 'bar' => new Illuminate\Database\Query\Expression('bar')), 'id');
-    //   equal(1, $result);
-    // });
-
-    it("insert method respects raw bindings", function () {
+    it("insert method respects raw bindings", function() {
       var result = sql.insert({'email': new Raw('CURRENT TIMESTAMP')}).into('users').toSql();
       expect(result.sql).to.equal('insert into "users" ("email") values (CURRENT TIMESTAMP)');
     });
 
-    it("update method", function () {
+    it("update method", function() {
       chain = sql.update({'email': 'foo', 'name': 'bar'}).table('users').where('id', '=', 1).toSql();
       expect(chain.sql).to.equal('update "users" set "email" = ?, "name" = ? where "id" = ?');
       expect(chain.bindings).to.eql(['foo', 'bar', 1]);
 
-      // $builder = $this.getMySqlBuilder();
-      // $builder.getConnection().shouldReceive('update').once().with('update `users` set `email` = ?, `name` = ? where `id` = ? order by `foo` desc limit 5', array('foo', 'bar', 1)).andReturn(1);
-      // var // chain = $builder.from('users').where('id', '=', 1).orderBy('foo', 'desc').limit(5).update(array('email' => 'foo', 'name' => 'bar'));
-      // var equal(1, chain);
+      chain = mysql.from('users').where('id', '=', 1).orderBy('foo', 'desc').limit(5).update({email: 'foo', name: 'bar'}).toSql();
+      expect(chain.sql).to.equal('update `users` set `email` = ?, `name` = ? where `id` = ? order by `foo` desc limit ?');
+      expect(chain.bindings).to.eql(['foo', 'bar', 1, 5]);
     });
 
-    it("update method with joins", function () {
-      chain = sql.from('users').join('orders', 'users.id', 'orders.user_id').where('users.id', '=', 1).update({'email': 'foo', 'name': 'bar'}).toSql();
-      expect(chain.sql).to.equal('update "users" inner join "orders" on "users"."id" = "orders"."user_id" set "email" = ?, "name" = ? where "users"."id" = ?');
+    it("update method with joins mysql", function() {
+      chain = mysql.from('users').join('orders', 'users.id', 'orders.user_id').where('users.id', '=', 1).update({'email': 'foo', 'name': 'bar'}).toSql();
+      expect(chain.sql).to.equal('update `users` inner join `orders` on `users`.`id` = `orders`.`user_id` set `email` = ?, `name` = ? where `users`.`id` = ?');
       expect(chain.bindings).to.eql(['foo', 'bar', 1]);
     });
 
-    // it("update method without joins on postgres", function () {
-    //   $builder = $this.getPostgresBuilder();
-    //   $builder.getConnection().shouldReceive('update').once().with('update "users" set "email" = ?, "name" = ? where "id" = ?', array('foo', 'bar', 1)).andReturn(1);
-    //   // $result = $builder.from('users').where('id', '=', 1).update(array('email' => 'foo', 'name' => 'bar'));
-    //   equal(1, $result);
-    // });
+    it("update method without joins on postgres", function() {
+      chain = sql.from('users').where('id', '=', 1).update({email: 'foo', name: 'bar'}).toSql();
+      expect(chain.sql).to.equal('update "users" set "email" = ?, "name" = ? where "id" = ?');
+      expect(chain.bindings).to.eql(['foo', 'bar', 1]);
+    });
 
-    // it("update method with joins on postgres", function () {
-    //   $builder = $this.getPostgresBuilder();
-    //   $builder.getConnection().shouldReceive('update').once().with('update "users" set "email" = ?, "name" = ? from "orders" where "users"."id" = ? and "users"."id" = "orders"."user_id"', array('foo', 'bar', 1)).andReturn(1);
-    //   // $result = $builder.from('users').join('orders', 'users.id', '=', 'orders.user_id').where('users.id', '=', 1).update(array('email' => 'foo', 'name' => 'bar'));
-    //   equal(1, $result);
-    // });
+    it("update method with joins on postgres");
+      // chain = sql.from('users').join('orders', 'users.id', '=', 'orders.user_id').where('users.id', '=', 1).update({email: 'foo', name: 'bar'}).toSql();
+      // expect(chain.sql).to.equal('update "users" set "email" = ?, "name" = ? from "orders" where "users"."id" = ? and "users"."id" = "orders"."user_id"');
+      // expect(chain.sql).to.eql(['foo', 'bar', 1]);
 
     it("update method respects raw", function() {
       chain = sql.from('users').where('id', '=', 1).update({email: new Raw('foo'), name: 'bar'}).toSql();
@@ -385,13 +363,13 @@ module.exports = function(postgresclient, mysqlclient, sqlite3client) {
       expect(chain.bindings).to.eql(['bar', 1]);
     });
 
-    it("delete method", function () {
+    it("delete method", function() {
       chain = sql.from('users').where('email', '=', 'foo').delete().toSql();
       expect(chain.sql).to.equal('delete from "users" where "email" = ?');
       expect(chain.bindings).to.eql(['foo']);
     });
 
-    it("truncate method", function () {
+    it("truncate method", function() {
       chain = mysql.table('users').truncate().toSql();
       expect(chain.sql).to.equal('truncate `users`');
       chain = sql.table('users').truncate().toSql();
@@ -404,42 +382,40 @@ module.exports = function(postgresclient, mysqlclient, sqlite3client) {
       }]);
     });
 
-    it("postgres insert get id", function () {
+    it("postgres insert get id", function() {
       chain = sql.from('users').insert({email: 'foo'}, 'id').toSql();
       expect(chain.sql).to.equal('insert into "users" ("email") values (?) returning "id"', ['foo']);
     });
 
-    // it("MySQL wrapping", function () {
-    //   $builder = $this.getMySqlBuilder();
-    //   $builder.select('*').from('users').toSql();
-    //   expect(chain.sql).to.equal('select * from `users`');
-    // });
+    it("MySQL wrapping", function() {
+      chain = mysql.select('*').from('users').toSql();
+      expect(chain.sql).to.equal('select * from `users`');
+    });
 
-    // it("SQLite order by", function () {
-    //   $builder = $this.getSQLiteBuilder();
-    //   $builder.select('*').from('users').orderBy('email', 'desc').toSql();
-    //   expect(chain.sql).to.equal('select * from "users" order by "email" desc');
-    // });
+    it("SQLite order by", function() {
+      chain = sqlite3.select('*').from('users').orderBy('email', 'desc').toSql();
+      expect(chain.sql).to.equal('select * from "users" order by "email" collate nocase desc');
+    });
 
-    // it("sql server limits and offsets", function () {
+    // it("sql server limits and offsets", function() {
     //   $builder = $this.getSqlServerBuilder();
-    //   $builder.select('*').from('users').take(10).toSql();
+    //   $builder.select('*').from('users').limit(10).toSql();
     //   expect(chain.sql).to.equal('select top 10 * from [users]');
 
     //   $builder = $this.getSqlServerBuilder();
-    //   $builder.select('*').from('users').skip(10).toSql();
+    //   $builder.select('*').from('users').offset(10).toSql();
     //   expect(chain.sql).to.equal('select * from (select *, row_number() over (order by (select 0)) as row_num from [users]) as temp_table where row_num >= 11');
 
     //   $builder = $this.getSqlServerBuilder();
-    //   $builder.select('*').from('users').skip(10).take(10).toSql();
+    //   $builder.select('*').from('users').offset(10).limit(10).toSql();
     //   expect(chain.sql).to.equal('select * from (select *, row_number() over (order by (select 0)) as row_num from [users]) as temp_table where row_num between 11 and 20');
 
     //   $builder = $this.getSqlServerBuilder();
-    //   $builder.select('*').from('users').skip(10).take(10).orderBy('email', 'desc').toSql();
+    //   $builder.select('*').from('users').offset(10).limit(10).orderBy('email', 'desc').toSql();
     //   expect(chain.sql).to.equal('select * from (select *, row_number() over (order by [email] desc) as row_num from [users]) as temp_table where row_num between 11 and 20');
     // });
 
-    it("providing null or false as second parameter builds correctly", function () {
+    it("providing null or false as second parameter builds correctly", function() {
       chain = sql.select('*').from('users').where('foo', null).toSql();
       expect(chain.sql).to.equal('select * from "users" where "foo" is null');
     });
@@ -460,19 +436,17 @@ module.exports = function(postgresclient, mysqlclient, sqlite3client) {
       expect(chain.bindings).to.eql(['baz']);
     });
 
-    // it("Postgres lock", function () {
-    //   $builder = $this.getPostgresBuilder();
-    //   $builder.select('*').from('foo').where('bar', '=', 'baz').lock().toSql();
-    //   expect(chain.sql).to.equal('select * from "foo" where "bar" = ? for update');
-    //   expect(chain.bindings).to.eql(array('baz'));
+    it("Postgres lock", function() {
+      chain = sql.transacting({}).select('*').from('foo').where('bar', '=', 'baz').forUpdate().toSql();
+      expect(chain.sql).to.equal('select * from "foo" where "bar" = ? for update');
+      expect(chain.bindings).to.eql(['baz']);
 
-    //   $builder = $this.getPostgresBuilder();
-    //   $builder.select('*').from('foo').where('bar', '=', 'baz').lock(false).toSql();
-    //   expect(chain.sql).to.equal('select * from "foo" where "bar" = ? for share');
-    //   expect(chain.bindings).to.eql(array('baz'));
-    // });
+      chain = sql.transacting({}).select('*').from('foo').where('bar', '=', 'baz').forShare().toSql();
+      expect(chain.sql).to.equal('select * from "foo" where "bar" = ? for share');
+      expect(chain.bindings).to.eql(['baz']);
+    });
 
-    // it("SQLServer lock", function () {
+    // it("SQLServer lock", function() {
     //   $builder = $this.getSqlServerBuilder();
     //   $builder.select('*').from('foo').where('bar', '=', 'baz').lock().toSql();
     //   expect(chain.sql).to.equal('select * from [foo] with(rowlock,updlock,holdlock) where [bar] = ?');
