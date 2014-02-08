@@ -454,17 +454,21 @@ module.exports = function(postgresclient, mysqlclient, sqlite3client) {
       expect(chain.sql).to.equal('select * from "users" where "foo" is null');
     });
 
-    // it("MySql lock", function () {
-    //   $builder = $this.getMySqlBuilder();
-    //   $builder.select('*').from('foo').where('bar', '=', 'baz').lock().toSql();
-    //   expect(chain.sql).to.equal('select * from `foo` where `bar` = ? for update');
-    //   expect(chain.bindings).to.eql(array('baz'));
+    it("MySQL locks", function (){
+      var chain = mysql.transacting({}).select('*').from('foo').where('bar', '=', 'baz').forUpdate().toSql();
+      expect(chain.sql).to.equal('select * from `foo` where `bar` = ? for update');
+      expect(chain.bindings).to.eql(['baz']);
 
-    //   $builder = $this.getMySqlBuilder();
-    //   $builder.select('*').from('foo').where('bar', '=', 'baz').lock(false).toSql();
-    //   expect(chain.sql).to.equal('select * from `foo` where `bar` = ? lock in share mode');
-    //   expect(chain.bindings).to.eql(array('baz'));
-    // });
+      chain = mysql.transacting({}).select('*').from('foo').where('bar', '=', 'baz').forShare().toSql();
+      expect(chain.sql).to.equal('select * from `foo` where `bar` = ? lock in share mode');
+      expect(chain.bindings).to.eql(['baz']);
+    });
+
+    it("should warn when trying to use forUpdate outside of a transaction", function() {
+      var chain = mysql.select('*').from('foo').where('bar', '=', 'baz').forUpdate().toSql();
+      expect(chain.sql).to.equal('select * from `foo` where `bar` = ?');
+      expect(chain.bindings).to.eql(['baz']);
+    });
 
     // it("Postgres lock", function () {
     //   $builder = $this.getPostgresBuilder();
