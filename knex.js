@@ -22,7 +22,6 @@ var _ = require('lodash');
 // the correct client reference & grammar.
 var Raw        = require('./lib/raw');
 var Helpers    = require('./lib/helpers');
-var ClientBase = require('./lib/clients/base');
 
 // Lazy-loaded modules.
 var Transaction, Migrate;
@@ -65,16 +64,12 @@ Knex.initialize = function(config) {
   };
 
   // Build the "client"
-  if (config instanceof ClientBase) {
-    client = config;
-  } else {
-    var clientName = config.client;
-    if (!Clients[clientName]) {
-      throw new Error(clientName + ' is not a valid Knex client, did you misspell it?');
-    }
-    Dialect = require(Clients[clientName]);
-    client  = new Dialect(config);
+  var clientName = config.client;
+  if (!Clients[clientName]) {
+    throw new Error(clientName + ' is not a valid Knex client, did you misspell it?');
   }
+  Dialect = require(Clients[clientName]);
+  client  = new Dialect(config);
 
   // The "query builder" is essentially just a `fluent-chain` object, which
   // passes through to the "client" once it's ready to coerce.
