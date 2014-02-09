@@ -1,4 +1,4 @@
-// Knex.js  0.5.2
+// Knex.js  0.6.0
 // --------------
 
 //     (c) 2013 Tim Griesser
@@ -71,15 +71,11 @@ Knex.initialize = function(config) {
   Dialect = require(Clients[clientName]);
   client  = new Dialect(config);
 
-  // The "query builder" is essentially just a `fluent-chain` object, which
-  // passes through to the "client" once it's ready to coerce.
-  var Query = require('./lib/query')(client);
-
   // Allow chaining methods from the root object, before
   // any other information is specified.
-  _.each(_.keys(Query.prototype), function(method) {
+  _.each(_.keys(client.Query.prototype), function(method) {
     knex[method] = function() {
-      var builder = (this instanceof Query) ? this : new Query();
+      var builder = (this instanceof client.Query) ? this : new client.Query();
       return builder[method].apply(builder, arguments);
     };
   });
@@ -98,7 +94,7 @@ Knex.initialize = function(config) {
     schema[key] = function(tableName) {
       client.SchemaBuilder = client.SchemaBuilder || client.initSchema();
       var builder = new client.SchemaBuilder();
-      return builder[key].apply(Schema, arguments);
+      return builder[key].apply(builder, arguments);
     };
   });
 

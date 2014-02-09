@@ -13,25 +13,27 @@ module.exports = function(client) {
 
     client.initSchema();
 
+    var tableSql;
     var SchemaBuilder = client.SchemaBuilder;
     var _ = require('lodash');
     var equal = require('assert').equal;
     var deepEqual = require('assert').deepEqual;
 
     it('test basic create table with charset and collate', function() {
-      var tableSql = new SchemaBuilder().createTable('users', function(table) {
+      tableSql = new SchemaBuilder().createTable('users', function(table) {
         table.increments('id');
         table.string('email');
         table.charset('utf8');
         table.collate('utf8_unicode_ci');
-      }).toSql();
+      });
 
-      equal(1, tableSql.length);
-      expect(tableSql[0].sql).to.equal('create table `users` (`id` int unsigned not null auto_increment primary key, `email` varchar(255)) default character set utf8 collate utf8_unicode_ci');
+      equal(1, tableSql.toSql().length);
+      expect(tableSql.toSql()[0].sql).to.equal('create table `users` (`id` int unsigned not null auto_increment primary key, `email` varchar(255)) default character set utf8 collate utf8_unicode_ci');
+      expect(tableSql.toString()).to.equal('create table `users` (`id` int unsigned not null auto_increment primary key, `email` varchar(255)) default character set utf8 collate utf8_unicode_ci;');
     });
 
     it('basic create table without charset or collate', function() {
-      var tableSql = new SchemaBuilder().table('users', function() {
+      tableSql = new SchemaBuilder().table('users', function() {
         this.increments('id');
         this.string('email');
       }).toSql();
@@ -41,21 +43,21 @@ module.exports = function(client) {
     });
 
     it('test drop table', function() {
-      var tableSql = new SchemaBuilder().dropTable('users').toSql();
+      tableSql = new SchemaBuilder().dropTable('users').toSql();
 
       equal(1, tableSql.length);
       expect(tableSql[0].sql).to.equal('drop table `users`');
     });
 
     it('test drop table if exists', function() {
-      var tableSql = new SchemaBuilder().dropTableIfExists('users').toSql();
+      tableSql = new SchemaBuilder().dropTableIfExists('users').toSql();
 
       equal(1, tableSql.length);
       expect(tableSql[0].sql).to.equal('drop table if exists `users`');
     });
 
     it('test drop column', function() {
-      var tableSql = new SchemaBuilder().table('users', function() {
+      tableSql = new SchemaBuilder().table('users', function() {
         this.dropColumn('foo');
       }).toSql();
 
@@ -64,7 +66,7 @@ module.exports = function(client) {
     });
 
     it('drops multiple columns with an array', function() {
-      var tableSql = new SchemaBuilder().table('users', function() {
+      tableSql = new SchemaBuilder().table('users', function() {
         this.dropColumn(['foo', 'bar']);
       }).toSql();
 
@@ -73,7 +75,7 @@ module.exports = function(client) {
     });
 
     it('drops multiple columns as multiple arguments', function() {
-      var tableSql = new SchemaBuilder().table('users', function() {
+      tableSql = new SchemaBuilder().table('users', function() {
         this.dropColumn('foo', 'bar');
       }).toSql();
 
@@ -82,7 +84,7 @@ module.exports = function(client) {
     });
 
     it('test drop primary', function() {
-      var tableSql = new SchemaBuilder().table('users', function() {
+      tableSql = new SchemaBuilder().table('users', function() {
         this.dropPrimary();
       }).toSql();
 
@@ -91,7 +93,7 @@ module.exports = function(client) {
     });
 
     it('test drop unique', function() {
-      var tableSql = new SchemaBuilder().table('users', function() {
+      tableSql = new SchemaBuilder().table('users', function() {
         this.dropUnique('foo');
       }).toSql();
 
@@ -100,7 +102,7 @@ module.exports = function(client) {
     });
 
     it('test drop index', function() {
-      var tableSql = new SchemaBuilder().table('users', function() {
+      tableSql = new SchemaBuilder().table('users', function() {
         this.dropIndex('foo');
       }).toSql();
 
@@ -109,7 +111,7 @@ module.exports = function(client) {
     });
 
     it('test drop foreign', function() {
-      var tableSql = new SchemaBuilder().table('users', function() {
+      tableSql = new SchemaBuilder().table('users', function() {
         this.dropForeign('foo');
       }).toSql();
 
@@ -118,7 +120,7 @@ module.exports = function(client) {
     });
 
     it('test drop timestamps', function() {
-      var tableSql = new SchemaBuilder().table('users', function() {
+      tableSql = new SchemaBuilder().table('users', function() {
         this.dropTimestamps();
       }).toSql();
 
@@ -127,14 +129,14 @@ module.exports = function(client) {
     });
 
     it('test rename table', function() {
-      var tableSql = new SchemaBuilder().renameTable('users', 'foo').toSql();
+      tableSql = new SchemaBuilder().renameTable('users', 'foo').toSql();
 
       equal(1, tableSql.length);
       expect(tableSql[0].sql).to.equal('rename table `users` to `foo`');
     });
 
     it('test adding primary key', function() {
-      var tableSql = new SchemaBuilder().table('users', function() {
+      tableSql = new SchemaBuilder().table('users', function() {
         this.primary('foo', 'bar');
       }).toSql();
 
@@ -143,7 +145,7 @@ module.exports = function(client) {
     });
 
     it('test adding unique key', function() {
-      var tableSql = new SchemaBuilder().table('users', function() {
+      tableSql = new SchemaBuilder().table('users', function() {
         this.unique('foo', 'bar');
       }).toSql();
 
@@ -152,7 +154,7 @@ module.exports = function(client) {
     });
 
     it('test adding index', function() {
-      var tableSql = new SchemaBuilder().table('users', function() {
+      tableSql = new SchemaBuilder().table('users', function() {
         this.index(['foo', 'bar'], 'baz');
       }).toSql();
 
@@ -161,7 +163,7 @@ module.exports = function(client) {
     });
 
     it('test adding foreign key', function() {
-      var tableSql = new SchemaBuilder().table('users', function() {
+      tableSql = new SchemaBuilder().table('users', function() {
         this.foreign('foo_id').references('id').on('orders');
       }).toSql();
 
@@ -170,7 +172,7 @@ module.exports = function(client) {
     });
 
     it('test adding incrementing id', function() {
-      var tableSql = new SchemaBuilder().table('users', function() {
+      tableSql = new SchemaBuilder().table('users', function() {
         this.increments('id');
       }).toSql();
 
@@ -179,7 +181,7 @@ module.exports = function(client) {
     });
 
     it('test adding big incrementing id', function() {
-      var tableSql = new SchemaBuilder().table('users', function() {
+      tableSql = new SchemaBuilder().table('users', function() {
         this.bigIncrements('id');
       }).toSql();
 
@@ -188,7 +190,7 @@ module.exports = function(client) {
     });
 
     it('test adding column after another column', function() {
-      var tableSql = new SchemaBuilder().table('users', function() {
+      tableSql = new SchemaBuilder().table('users', function() {
         this.string('name').after('foo');
       }).toSql();
 
@@ -197,7 +199,7 @@ module.exports = function(client) {
     });
 
     it('test adding string', function() {
-      var tableSql = new SchemaBuilder().table('users', function() {
+      tableSql = new SchemaBuilder().table('users', function() {
         this.string('foo');
       }).toSql();
 
@@ -206,7 +208,7 @@ module.exports = function(client) {
     });
 
     it('uses the varchar column constraint', function() {
-      var tableSql = new SchemaBuilder().table('users', function() {
+      tableSql = new SchemaBuilder().table('users', function() {
         this.string('foo', 100);
       }).toSql();
 
@@ -215,7 +217,7 @@ module.exports = function(client) {
     });
 
     it('chains notNull and defaultTo', function() {
-      var tableSql = new SchemaBuilder().table('users', function() {
+      tableSql = new SchemaBuilder().table('users', function() {
         this.string('foo', 100).notNull().defaultTo('bar');
       }).toSql();
 
@@ -224,7 +226,7 @@ module.exports = function(client) {
     });
 
     it('allows for raw values in the default field', function() {
-      var tableSql = new SchemaBuilder().table('users', function() {
+      tableSql = new SchemaBuilder().table('users', function() {
         this.string('foo', 100).nullable().defaultTo(knex.raw('CURRENT TIMESTAMP'));
       }).toSql();
 
@@ -233,7 +235,7 @@ module.exports = function(client) {
     });
 
     it('test adding text', function() {
-      var tableSql = new SchemaBuilder().table('users', function() {
+      tableSql = new SchemaBuilder().table('users', function() {
         this.text('foo');
       }).toSql();
 
@@ -242,7 +244,7 @@ module.exports = function(client) {
     });
 
     it('test adding big integer', function() {
-      var tableSql = new SchemaBuilder().table('users', function() {
+      tableSql = new SchemaBuilder().table('users', function() {
         this.bigInteger('foo');
       }).toSql();
 
@@ -251,7 +253,7 @@ module.exports = function(client) {
     });
 
     it('test adding integer', function() {
-      var tableSql = new SchemaBuilder().table('users', function() {
+      tableSql = new SchemaBuilder().table('users', function() {
         this.integer('foo');
       }).toSql();
 
@@ -260,7 +262,7 @@ module.exports = function(client) {
     });
 
     it('test adding medium integer', function() {
-      var tableSql = new SchemaBuilder().table('users', function() {
+      tableSql = new SchemaBuilder().table('users', function() {
         this.mediumint('foo');
       }).toSql();
 
@@ -269,7 +271,7 @@ module.exports = function(client) {
     });
 
     it('test adding small integer', function() {
-      var tableSql = new SchemaBuilder().table('users', function() {
+      tableSql = new SchemaBuilder().table('users', function() {
         this.smallint('foo');
       }).toSql();
 
@@ -278,7 +280,7 @@ module.exports = function(client) {
     });
 
     it('test adding tiny integer', function() {
-      var tableSql = new SchemaBuilder().table('users', function() {
+      tableSql = new SchemaBuilder().table('users', function() {
         this.tinyint('foo');
       }).toSql();
 
@@ -287,7 +289,7 @@ module.exports = function(client) {
     });
 
     it('test adding float', function() {
-      var tableSql = new SchemaBuilder().table('users', function() {
+      tableSql = new SchemaBuilder().table('users', function() {
         this.float('foo', 5, 2);
       }).toSql();
 
@@ -296,7 +298,7 @@ module.exports = function(client) {
     });
 
     it('test adding double', function() {
-      var tableSql = new SchemaBuilder().table('users', function() {
+      tableSql = new SchemaBuilder().table('users', function() {
         this.double('foo');
       }).toSql();
 
@@ -305,7 +307,7 @@ module.exports = function(client) {
     });
 
     it('test adding double specifying precision', function() {
-      var tableSql = new SchemaBuilder().table('users', function() {
+      tableSql = new SchemaBuilder().table('users', function() {
         this.double('foo', 15, 8);
       }).toSql();
 
@@ -314,7 +316,7 @@ module.exports = function(client) {
     });
 
     it('test adding decimal', function() {
-      var tableSql = new SchemaBuilder().table('users', function() {
+      tableSql = new SchemaBuilder().table('users', function() {
         this.decimal('foo', 5, 2);
       }).toSql();
 
@@ -323,7 +325,7 @@ module.exports = function(client) {
     });
 
     it('test adding boolean', function() {
-      var tableSql = new SchemaBuilder().table('users', function() {
+      tableSql = new SchemaBuilder().table('users', function() {
         this.boolean('foo');
       }).toSql();
 
@@ -332,7 +334,7 @@ module.exports = function(client) {
     });
 
     it('test adding enum', function() {
-      var tableSql = new SchemaBuilder().table('users', function() {
+      tableSql = new SchemaBuilder().table('users', function() {
         this.enum('foo', ['bar', 'baz']);
       }).toSql();
 
@@ -341,7 +343,7 @@ module.exports = function(client) {
     });
 
     it('test adding date', function() {
-      var tableSql = new SchemaBuilder().table('users', function() {
+      tableSql = new SchemaBuilder().table('users', function() {
         this.date('foo');
       }).toSql();
 
@@ -350,7 +352,7 @@ module.exports = function(client) {
     });
 
     it('test adding date time', function() {
-      var tableSql = new SchemaBuilder().table('users', function() {
+      tableSql = new SchemaBuilder().table('users', function() {
         this.dateTime('foo');
       }).toSql();
 
@@ -359,7 +361,7 @@ module.exports = function(client) {
     });
 
     it('test adding time', function() {
-      var tableSql = new SchemaBuilder().table('users', function() {
+      tableSql = new SchemaBuilder().table('users', function() {
         this.time('foo');
       }).toSql();
 
@@ -368,7 +370,7 @@ module.exports = function(client) {
     });
 
     it('test adding time stamp', function() {
-      var tableSql = new SchemaBuilder().table('users', function() {
+      tableSql = new SchemaBuilder().table('users', function() {
         this.timestamp('foo');
       }).toSql();
 
@@ -377,7 +379,7 @@ module.exports = function(client) {
     });
 
     it('test adding time stamps', function() {
-      var tableSql = new SchemaBuilder().table('users', function() {
+      tableSql = new SchemaBuilder().table('users', function() {
         this.timestamps();
       }).toSql();
 
@@ -386,7 +388,7 @@ module.exports = function(client) {
     });
 
     it('test adding binary', function() {
-      var tableSql = new SchemaBuilder().table('users', function() {
+      tableSql = new SchemaBuilder().table('users', function() {
         this.binary('foo');
       }).toSql();
 

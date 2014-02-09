@@ -44,25 +44,10 @@ require('./unit/query/builder')(postgres.client, mysql.client, sqlite3.client);
 //   require('./unit/clients/sqlite3');
 // });
 
-// Integration Tests
+// // Integration Tests
 // describe('Integration Tests', function() {
-
-//   var helper = require('./integration/helper');
-
-//   before(function() {
-//     helper.setLib(this);
-//   });
-
-//   require('./integration/knex');
-
+//   var runner = require('./integration')(this);
 //   after(function() {
-//     helper.writeResult();
+//     runner.writeResult();
 //   });
-
-// });
-
-// Benchmarks
-// describe('Benchmarks', function() {
-
-
 // });

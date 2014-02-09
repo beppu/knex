@@ -15,6 +15,9 @@ module.exports = function(postgresclient, mysqlclient, sqlite3client) {
     var chain;
 
     it("basic select", function() {
+      chain = sql.select('*').from('users').then(function() {
+        console.log(arguments);
+      });
       chain = sql.select('*').from('users').toSql();
       expect(chain.sql).to.equal('select * from "users"');
     });
@@ -40,9 +43,10 @@ module.exports = function(postgresclient, mysqlclient, sqlite3client) {
     });
 
     it("basic wheres", function() {
-      chain = sql.select('*').from('users').where('id', '=', 1).toSql();
-      expect(chain.sql).to.equal('select * from "users" where "id" = ?');
-      expect(chain.bindings).to.eql([1]);
+      chain = sql.select('*').from('users').where('id', '=', 1);
+      expect(chain.toSql().sql).to.equal('select * from "users" where "id" = ?');
+      expect(chain.toSql().bindings).to.eql([1]);
+      expect(chain.toString()).to.equal('select * from "users" where "id" = 1;');
     });
 
     it("where betweens", function() {
@@ -216,9 +220,8 @@ module.exports = function(postgresclient, mysqlclient, sqlite3client) {
     });
 
     it("nested wheres", function() {
-      chain = sql.select('*').from('users').where('email', '=', 'foo').orWhere(function($q)
-      {
-        $q.where('name', '=', 'bar').where('age', '=', 25);
+      chain = sql.select('*').from('users').where('email', '=', 'foo').orWhere(function(qb) {
+        qb.where('name', '=', 'bar').where('age', '=', 25);
       }).toSql();
       expect(chain.sql).to.equal('select * from "users" where "email" = ? or ("name" = ? and "age" = ?)');
       expect(chain.bindings).to.eql(['foo', 'bar', 25]);
