@@ -1,5 +1,7 @@
 module.exports = function(testSuite) {
 
+  var _ = require('lodash');
+
   // This is where all of the info from the query calls goes...
   var comparable = {};
   var counters   = {};
@@ -15,16 +17,18 @@ module.exports = function(testSuite) {
   }
 
   // Log a statement
-  function logStatement(logging, logWhat, client, value) {
+  function logStatement(logging, logWhat, client, handler) {
     if (logWhat !== true && logWhat !== logging) return;
     var testTitle    = testSuite.ctx.test.title;
     var parentTitle  = testSuite.ctx.test.parent.title;
     var group        = (output[parentTitle] = (output[parentTitle] || {}));
     var test         = (group[testTitle] = (group[testTitle] || {}));
     var dialect      = (test[client.dialect] = (test[client.dialect] || {}));
-    dialect[logging] = dialect[logging] || [];
-    dialect[logging].push(value);
-    // console.log(JSON.stringify(output, true, 4));
+    if (logging === 'sql') {
+      if (!dialect.sql) dialect.sql = [];
+      if (!dialect.bindings) dialect.bindings = [];
+      handler(dialect);
+    }
   }
 
   return {
@@ -40,9 +44,8 @@ module.exports = function(testSuite) {
 
       client.Query.attachChainable('logMe');
       client.QueryBuilder.prototype.logMe = function(logWhat) {
-        this._ensureSingle('isLogging', {
-          value: logWhat
-        });
+        this.__isLogging = logWhat || true;
+        return this;
       };
       client.SchemaBuilder.prototype.logMe = function TestLoggerSchema$logMe(logWhat) {
         this.__isLogging = logWhat || true;
@@ -52,30 +55,32 @@ module.exports = function(testSuite) {
       var schemaToSql = client.SchemaBuilder.prototype.toSql;
       client.SchemaBuilder.prototype.toSql = function() {
         var sql = schemaToSql.apply(this, arguments);
-        logStatement('sql', this.__isLogging, client, sql);
+        logStatement('sql', this.__isLogging, client, function(dialect) {
+          dialect.sql.push(_.pluck(sql, 'sql'));
+          var pluckedBindings = _.pluck(sql, 'bindings');
+          if (pluckedBindings) dialect.bindings.push(pluckedBindings);
+        });
         return sql;
       };
 
       var queryToSql = client.QueryBuilder.prototype.toSql;
       client.QueryBuilder.prototype.toSql = function() {
         var sql = queryToSql.apply(this, arguments);
-        logStatement('sql', this.__isLogging, client, sql);
+        logStatement('sql', this.__isLogging, client, function(dialect) {
+          dialect.sql.push(sql.sql);
+          dialect.bindings.push(sql.bindings);
+        });
         return sql;
       };
 
       var queryThen = client.Query.prototype.then;
       client.Query.prototype.then = function() {
-        return queryThen.apply(this, arguments).tap(function(resp) {
-          console.log(resp);
-        });
+        return queryThen.apply(this, arguments);
       };
       var schemaThen = client.SchemaBuilder.prototype.then;
       client.SchemaBuilder.prototype.then = function() {
-        return schemaThen.apply(this, arguments).tap(function(resp) {
-          console.log(resp);
-        });
+        return schemaThen.apply(this, arguments);
       };
-
 
       return knex;
 

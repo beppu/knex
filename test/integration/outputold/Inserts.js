@@ -50,7 +50,7 @@ module.exports = {
       result: [5]
     }
   },
-  'will fail when multple inserts are made into a unique column': {
+  'will fail when multiple inserts are made into a unique column': {
     mysql: {
       bindings: ['test5@example.com','Test','User',2,new Date()],
       sql: 'insert into `accounts` (`about`, `created_at`, `email`, `first_name`, `last_name`, `logins`, `updated_at`) values (?, ?, ?, ?, ?, ?, ?)'

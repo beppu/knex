@@ -21,6 +21,7 @@ module.exports = function(testSuite) {
 
   var mysql = logger.client(Knex.initialize({
     client: 'mysql',
+    debug: true,
     connection: config.mysql,
     pool: _.extend({}, pool, {
       afterCreate: function(connection, callback) {

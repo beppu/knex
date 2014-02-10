@@ -86,7 +86,7 @@ module.exports = function(knex) {
 
     });
 
-    it('will fail when multple inserts are made into a unique column', function() {
+    it('will fail when multiple inserts are made into a unique column', function() {
 
       return knex('accounts')
         .logMe()
