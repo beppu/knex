@@ -2,8 +2,8 @@ module.exports = function(postgresclient, mysqlclient, sqlite3client) {
 
   var Raw     = require('../../../lib/raw');
 
-  var PGQuery    = require('../../../lib/query')(postgresclient);
-  var MySQLQuery = require('../../../lib/query')(mysqlclient);
+  var PGQuery      = require('../../../lib/query')(postgresclient);
+  var MySQLQuery   = require('../../../lib/query')(mysqlclient);
   var Sqlite3Query = require('../../../lib/query')(sqlite3client);
 
   var sql     = new PGQuery();
@@ -15,9 +15,6 @@ module.exports = function(postgresclient, mysqlclient, sqlite3client) {
     var chain;
 
     it("basic select", function() {
-      chain = sql.select('*').from('users').then(function() {
-        console.log(arguments);
-      });
       chain = sql.select('*').from('users').toSql();
       expect(chain.sql).to.equal('select * from "users"');
     });
@@ -46,7 +43,7 @@ module.exports = function(postgresclient, mysqlclient, sqlite3client) {
       chain = sql.select('*').from('users').where('id', '=', 1);
       expect(chain.toSql().sql).to.equal('select * from "users" where "id" = ?');
       expect(chain.toSql().bindings).to.eql([1]);
-      expect(chain.toString()).to.equal('select * from "users" where "id" = 1;');
+      expect(chain.toQuery()).to.equal('select * from "users" where "id" = 1;');
     });
 
     it("where betweens", function() {

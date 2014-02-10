@@ -8,18 +8,18 @@ module.exports = function(knex) {
       return Promise.all([
         knex.schema.dropTableIfExists('test_foreign_table_two').logMe('sql'),
         knex.schema.dropTableIfExists('test_table_one').logMe('sql'),
-        knex.schema.dropTableIfExists('test_table_two'),
-        knex.schema.dropTableIfExists('test_table_three'),
-        knex.schema.dropTableIfExists('datatype_test'),
-        knex.schema.dropTableIfExists('accounts'),
-        knex.schema.dropTableIfExists('test_default_table'),
-        knex.schema.dropTableIfExists('composite_key_test'),
-        knex.schema.dropTableIfExists('charset_collate_test'),
-        knex.schema.dropTableIfExists('knex_migrations'),
-        knex.schema.dropTableIfExists('migration_test_1'),
-        knex.schema.dropTableIfExists('migration_test_2'),
-        knex.schema.dropTableIfExists('migration_test_2_1'),
-        knex.schema.dropTableIfExists('catch_test')
+        knex.schema.dropTableIfExists('test_table_two')
+          .dropTableIfExists('test_table_three')
+          .dropTableIfExists('datatype_test')
+          .dropTableIfExists('accounts')
+          .dropTableIfExists('test_default_table')
+          .dropTableIfExists('composite_key_test')
+          .dropTableIfExists('charset_collate_test')
+          .dropTableIfExists('knex_migrations')
+          .dropTableIfExists('migration_test_1')
+          .dropTableIfExists('migration_test_2')
+          .dropTableIfExists('migration_test_2_1')
+          .dropTableIfExists('catch_test')
       ]);
     });
 

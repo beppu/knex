@@ -28,8 +28,7 @@ require('./unit/schema/sqlite3')(sqlite3.client);
 require('./unit/schema/mysql')(mysql.client);
 require('./unit/query/builder')(postgres.client, mysql.client, sqlite3.client);
 
-
-// Unit tests
+// // Unit tests
 // describe('Unit Tests', function() {
 //   require('./unit/knex');
 //   require('./unit/common');
@@ -44,10 +43,10 @@ require('./unit/query/builder')(postgres.client, mysql.client, sqlite3.client);
 //   require('./unit/clients/sqlite3');
 // });
 
-// // Integration Tests
-// describe('Integration Tests', function() {
-//   var runner = require('./integration')(this);
-//   after(function() {
-//     runner.writeResult();
-//   });
-// });
+// Integration Tests
+describe('Integration Tests', function() {
+  var runner = require('./integration')(this);
+  after(function() {
+    runner.writeResult();
+  });
+});

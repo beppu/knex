@@ -92,7 +92,7 @@ Knex.initialize = function(config) {
   _.each(['table', 'createTable', 'editTable', 'dropTable',
     'dropTableIfExists',  'renameTable', 'hasTable', 'hasColumn'], function(key) {
     schema[key] = function(tableName) {
-      client.SchemaBuilder = client.SchemaBuilder || client.initSchema();
+      if (!client.SchemaBuilder) client.initSchema();
       var builder = new client.SchemaBuilder();
       return builder[key].apply(builder, arguments);
     };
@@ -104,7 +104,7 @@ Knex.initialize = function(config) {
   _.each(['make', 'latest', 'rollback', 'currentVersion'], function(method) {
     migrate[method] = function() {
       Migrate = Migrate || require('./lib/migrate');
-      var migration = new Migrate(base);
+      var migration = new Migrate(knex);
       return migration[method].apply(migration, arguments);
     };
   });
